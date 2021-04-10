@@ -9,25 +9,30 @@ def space_value(board, index):
     Returns the value in the board at the given index, if not a string that
     contains a space. Otherwise, it returns the index as a string.
 
-    Arguments: board: An array of nine strings index: The value in the board to
+    Arguments: board: An array of nine strings | index: The value in the board to
     interrogate
     """
-    pass
+    if board[index] != " ":
+        return board[index]
+    else:
+        return f'{index}'
 
 
 def draw_board(board):
     """This function prints out the board that it was passed."""
-    print("   |   |")
+    # print("   |   |")
+    print("----------------------")
     print(f" {space_value(board, 7)} | {space_value(board, 8)} | {space_value(board, 9)}")
-    print("   |   |")
-    print("-----------")
-    print("   |   |")
+    # print("   |   |")
+    print("----------------------")
+    # print("   |   |")
     print(f" {space_value(board, 4)} | {space_value(board, 5)} | {space_value(board, 6)}")
-    print("   |   |")
-    print("-----------")
-    print("   |   |")
+    # print("   |   |")
+    print("----------------------")
+    # print("   |   |")
     print(f" {space_value(board, 1)} | {space_value(board, 2)} | {space_value(board, 3)}")
-    print("   |   |")
+    # print("   |   |")
+    print("----------------------")
 
 
 def get_player_and_computer_letters():
@@ -52,12 +57,16 @@ def play_again():
     """
     Determines if the player wants to play again.
 
-    It should as the player if they want to play again, then read input from the
+    It should ask the player if they want to play again, then read input from the
     player to determine if they typed some value that begins with the letter
     "y". If the value does begin with "y", then return True. Otherwise, return
     False.
     """
-    pass
+    response = input('Would you like to play again? \n')
+    
+    if response.startswith('y'):
+        return True
+    return False
 
 
 def make_move(board, letter, move):
@@ -73,7 +82,32 @@ def is_winner(board, letter):
     Given the board and the player's letter, this function returns True if that
     player has won.
     """
-    pass
+    possible_wins = [
+        #horizontal
+        [1, 2, 3],
+        [4, 5, 6], 
+        [7, 8, 9],
+        #vertical
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+        #diagonal
+        [1, 5, 9],
+        [3, 5, 7],
+    ]
+
+    ## loop over all win sets
+    for win_set in possible_wins:
+        ## for a given win set, loop over the space numbers provided in the win_set
+        ## filter whether the value stored at the given space matches the players letter
+        ## if all 3 match, the returned list will have a length of 3, indicating a win
+        win_boolean = len([ space for space in win_set if board[space] == letter]) == 3
+        if win_boolean:
+            return True
+    
+    return False
+        
+
 
 
 def is_space_free(board, move):
@@ -91,7 +125,20 @@ def get_player_move(board):
     then the function tells the player that is an invalid move and prompts the
     player, again, for a value.
     """
-    pass
+    intake = input('Please type the integer of the square for which you would like to move: ')
+    try: 
+        move = int(intake)
+    except: 
+        print(f'Hmmm... I do not believe that was an integer. Please try again...')
+        return get_player_move(board)
+    
+    if is_space_free(board, move):
+        return move
+    else:
+        print(f'Sorry, that square is already taken. Lets try again...')
+        return get_player_move(board)
+
+    
 
 
 # This function must be completed
@@ -102,8 +149,15 @@ def get_random_move(board):
 
     To get nice random moves, consider using the random.shuffle method, here.
     """
-    pass
+    nums = [i for i in range(1, 10)]    # return range of nums from 1 - 9
+    random.shuffle(nums)                # shuffle nums range
+    comp_move = nums[0]                 # take 1st of newly shuffled range
 
+    if is_space_free(board, comp_move): # if available...
+        return comp_move                # proceed with move
+    else: 
+        return get_random_move(board)   # else, try again
+    
 
 # This function must be completed
 def is_board_full(board):
@@ -111,7 +165,12 @@ def is_board_full(board):
     Return True if every space on the board has been taken. Otherwise return
     False.
     """
-    pass
+    board[0] = "0"  ## board initialize with 10 " " spaces, but only 9 on the board; fill board[0] by default
+    for index, value in enumerate(board):
+        if is_space_free(board, index):
+            return False
+    return True
+
 
 print("Welcome to Tic Tac Toe!")
 
